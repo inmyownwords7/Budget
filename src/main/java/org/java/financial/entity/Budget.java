@@ -1,7 +1,6 @@
-package org.java.financial.budget.entity;
+package org.java.financial.entity;
 
 import jakarta.persistence.*;
-import org.java.financial.entity.User;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,8 +18,9 @@ public class Budget {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // ✅ Each budget belongs to one user
 
-    @Column(nullable = false)
-    private String category; // ✅ Budget category (e.g., Food, Rent, Travel)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount; // ✅ Total budget allocated
@@ -61,9 +61,10 @@ public class Budget {
     }
 
     // ✅ Constructors
-    public Budget() {}
+    public Budget() {
+    }
 
-    public Budget(User user, String category, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
+    public Budget(User user, Category category, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
         this.user = user;
         this.category = category;
         this.amount = amount;
@@ -74,29 +75,73 @@ public class Budget {
     }
 
     // ✅ Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public User getUser() {
+        return user;
+    }
 
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; updateRemaining(); }
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-    public BigDecimal getSpent() { return spent; }
-    public void setSpent(BigDecimal spent) { this.spent = spent; updateRemaining(); }
+    public Category getCategory() {
+        return category;
+    }
 
-    public BigDecimal getRemaining() { return remaining; }
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+        updateRemaining();
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public BigDecimal getSpent() {
+        return spent;
+    }
+
+    public void setSpent(BigDecimal spent) {
+        this.spent = spent;
+        updateRemaining();
+    }
+
+    public BigDecimal getRemaining() {
+        return remaining;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 }
