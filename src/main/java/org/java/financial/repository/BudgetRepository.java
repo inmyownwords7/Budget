@@ -6,7 +6,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Repository for managing Budget entity operations.
+ */
 @Repository
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
-    List<Budget> findByUserUserId(Long userId); // ✅ Correct method
+
+    /**
+     * ✅ Finds budgets associated with a specific user.
+     */
+    List<Budget> findByUserUserId(Long userId);
+
 }

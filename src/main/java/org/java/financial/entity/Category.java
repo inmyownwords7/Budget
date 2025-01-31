@@ -5,21 +5,21 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "categories")
 public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
-    @Column(nullable = false)
-    private String categoryName;
-    @Column(name = "category_description")
+
+    @Column(nullable = false, unique = true)
+    private String categoryName; // ✅ This must match the repository method
+
     private String categoryDescription;
 
-    @Enumerated(EnumType.STRING) // ✅ Store enum as a string in the database
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private CategoryType categoryType;
 
-    //TODO Make a BudgetList
     public Category() {
-
     }
 
     public Category(String categoryName, String categoryDescription, CategoryType categoryType) {
@@ -30,10 +30,6 @@ public class Category {
 
     public Long getCategoryId() {
         return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
     }
 
     public String getCategoryName() {

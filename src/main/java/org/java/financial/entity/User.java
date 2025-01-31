@@ -1,46 +1,41 @@
 package org.java.financial.entity;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50)
     private String username;
 
     @Column(nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER) // ✅ Each user has one role
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    // Many-to-many relationship for roles (instead of many-to-one)
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();  // Initialize the Set to avoid NullPointerException
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> transactions;
 
-    // Constructors, Getters, Setters
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Budget> budgets;
+
+    // ✅ Default constructor (needed by JPA)
     public User() {}
 
-    public User(String username, String password, Set<Role> roles) {
+    public User(String username, String password, Role role) {
         this.username = username;
         this.password = password;
-        this.roles = roles;
+        this.role = role;
     }
 
     public Long getUserId() {
@@ -67,44 +62,51 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
-//    // Implementing methods from UserDetails interface
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        // Convert Set<Role> to Set<GrantedAuthority> by mapping each Role to GrantedAuthority
-//        return roles.stream()
-//                .map(role -> (GrantedAuthority) role)
-//                .collect(Collectors.toSet());
-//    }
-    // Convert Set<Role> to Collection<? extends GrantedAuthority>
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;  // Returning roles as authorities
-    }
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
+    public List<Budget> getBudgets() {
+        return budgets;
+    }
+
+    public void setBudgets(List<Budget> budgets) {
+        this.budgets = budgets;
+    }
+
+    // ✅ Equals & HashCode based on userId
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(userId, user.userId);
     }
 
     @Override
-    public boolean isEnabled() {
-        return true;
+    public int hashCode() {
+        return Objects.hash(userId);
+    }
+
+    // ✅ toString() for debugging
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", role=" + (role != null ? role.getRoleName() : "null") +
+                '}';
     }
 }
