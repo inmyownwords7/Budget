@@ -2,6 +2,7 @@ package org.java.financial.service;
 
 import org.java.financial.entity.Budget;
 import org.java.financial.entity.User;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;

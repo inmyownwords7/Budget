@@ -2,38 +2,32 @@ package org.java.financial.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 import jakarta.persistence.*;
-
 import java.util.Set;
-
+import org.java.financial.entity.User;
 @Entity
 @Table(name = "roles")
 public class Role implements GrantedAuthority {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ✅ Auto-increment role_id
+    private Long roleId;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true) // ✅ Role names are unique
     private String roleName;
 
-    // One-to-many relationship with User entities; cascade all operations
-    @ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles") // ✅ Users can share roles
     private Set<User> users;
 
-    // Default constructor
     public Role() {}
 
-    // Constructor with role name
     public Role(String roleName) {
         this.roleName = roleName;
     }
 
-    @Override
-    public String getAuthority() {
-        return roleName; // Return the authority name for Spring Security
+    public Long getRoleId() {
+        return roleId;
     }
 
-    // Getter and Setter for roleName
     public String getRoleName() {
         return roleName;
     }
@@ -42,7 +36,6 @@ public class Role implements GrantedAuthority {
         this.roleName = roleName;
     }
 
-    // Getter and Setter for users (if needed, to access users in this role)
     public Set<User> getUsers() {
         return users;
     }
@@ -51,11 +44,9 @@ public class Role implements GrantedAuthority {
         this.users = users;
     }
 
+    // ✅ Required by GrantedAuthority interface
     @Override
-    public String toString() {
-        return "Role{" +
-                "id=" + id +
-                ", roleName='" + roleName + '\'' +
-                '}';
+    public String getAuthority() {
+        return roleName;
     }
 }

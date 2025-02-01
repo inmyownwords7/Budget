@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
+import org.java.financial.entity.*;
 @Entity
 @Table(name = "transactions")
 public class Transaction {
