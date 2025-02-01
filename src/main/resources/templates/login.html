@@ -2,29 +2,35 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="/css/styles.css"> <!-- Optional: Custom Styles -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<h2>Login</h2>
+<div class="container">
+    <h2>Login</h2>
 
-<!-- Display error messages -->
-<p th:if="${param.error}" style="color: red;">Invalid username or password</p>
-<p th:if="${param.logout}" style="color: green;">You have been logged out</p>
+    <p th:if="${param.error}" class="error" th:text="${param.error}"></p>
 
-<form th:action="@{/perform_login}" method="post">
-    <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-    </div>
+    <form th:action="@{/do-login}" method="post">
+        <label>Username:</label>
+        <label>
+            <input type="text" name="username" required />
+        </label>
+        <br/>
 
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-    </div>
+        <label>Password:</label>
+        <label>
+            <input type="password" name="password" required />
+        </label>
+        <br/>
+        <!-- ✅ Remember Me Checkbox -->
+        <label for="remember-me">
+            <input type="checkbox" id="remember-me" name="remember-me" />
+            Remember Me
+        </label>
+        <button type="submit">Login</button>
+    </form>
 
-    <button type="submit">Login</button>
-</form>
-
-<p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+    <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+</div>
 </body>
 </html>

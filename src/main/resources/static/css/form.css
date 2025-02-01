@@ -1,0 +1,117 @@
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Container Styling */
+.container {
+    width: 60%;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Headers */
+h2, h3 {
+    text-align: center;
+    color: #333;
+}
+
+/* Forms */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: #444;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+/* Error Messages */
+.error {
+    background: #ffdddd;
+    color: #d8000c;
+    padding: 10px;
+    border-left: 5px solid #d8000c;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #007bff;
+    color: white;
+}
+
+td {
+    color: #333;
+}
+
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+/* Buttons in Table */
+td form {
+    display: inline-block;
+}
+
+td form button {
+    margin: 5px;
+    background: #28a745;
+}
+
+td form button:hover {
+    background: #218838;
+}
+
+td form button:last-child {
+    background: #dc3545;
+}
+
+td form button:last-child:hover {
+    background: #c82333;
+}

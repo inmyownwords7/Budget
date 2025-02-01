@@ -28,6 +28,19 @@ public class Category {
         this.categoryType = categoryType;
     }
 
+    public Category(String categoryName, String categoryDescription, CategoryType categoryType, Long categoryId) {
+        this.categoryName = categoryName;
+        this.categoryDescription = categoryDescription;
+        this.categoryType = categoryType;
+        this.categoryId = categoryId;
+    }
+
+    public Category(Long categoryId, String categoryName, String categoryDescription) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.categoryDescription = categoryDescription;
+    }
+
     public Long getCategoryId() {
         return categoryId;
     }

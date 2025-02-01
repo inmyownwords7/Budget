@@ -1,0 +1,12 @@
+<form th:action="@{/api/do-transaction}" th:object="${transactionRequest}" method="post">
+  <label>Amount:</label>
+  <input type="number" step="0.01" th:field="*{amount}" required />
+
+  <label>Type:</label>
+  <select th:field="*{type}">
+    <option value="INCOME">Income</option>
+    <option value="EXPENSE">Expense</option>
+  </select>
+
+  <button type="submit">Submit Transaction</button> <!-- ✅ Sends a POST request -->
+</form>

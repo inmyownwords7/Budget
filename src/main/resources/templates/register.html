@@ -1,33 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-
 <div class="container">
     <h2>Register</h2>
 
-    <!-- Show error message if registration fails -->
-    <p th:if="${error}" style="color:red;" th:text="${error}"></p>
+    <p th:if="${error}" class="error" th:text="${error}"></p>
+    <p th:if="${success}" class="success" th:text="${success}"></p>
 
-    <!-- Show success message -->
-    <p th:if="${success}" style="color:green;">Registration successful! <a th:href="@{/login}">Login here</a></p>
-    <form action="#" th:action="@{/register}" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+    <form th:action="@{/do-register}" th:object="${user}" method="post">
+        <label>Username:</label>
+        <input type="text" th:field="*{username}" required />
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <label>Password:</label>
+        <input type="password" th:field="*{password}" required />
 
-        <button type="submit">Register</button>
+        <button type="submit">Register</button> <!-- ✅ Sends a POST request -->
     </form>
+
 
     <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
 </div>
-
 </body>
 </html>

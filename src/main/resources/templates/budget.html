@@ -1,0 +1,14 @@
+<!--/*@thymesVar id="Transactions" type=""*/-->
+<form th:action="@{/api/do-budget}" th:object="${Transactions}" method="post">
+  <label>Category:</label>
+  <label>
+    <input type="text" th:field="*{transactionName}" required />
+  </label>
+
+  <label>Amount:</label>
+  <label>
+    <input type="number" step="0.01" th:field="*{amount}" required />
+  </label>
+
+  <button type="submit">Create Budget</button> <!-- ✅ Sends a POST request -->
+</form>
