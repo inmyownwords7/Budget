@@ -5,8 +5,7 @@ import com.itextpdf.kernel.pdf.*;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.*;
 import com.opencsv.CSVWriter;
-import org.java.financial.entity.Transaction;
-
+import org.java.financial.dto.TransactionReportDto;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,13 +15,12 @@ import java.util.List;
  * Utility class to generate financial reports in JSON, CSV, and PDF formats.
  */
 public class ReportGenerator {
-
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Converts transactions to JSON and saves to a file.
      */
-    public static void generateJsonReport(List<Transaction> transactions, String filePath) {
+    public static void generateJsonReport(List<TransactionReportDto> transactions, String filePath) {
         try {
             objectMapper.writeValue(new File(filePath), transactions);
             System.out.println("✅ JSON Report Generated: " + filePath);
@@ -34,13 +32,13 @@ public class ReportGenerator {
     /**
      * Converts transactions to CSV and saves to a file.
      */
-    public static void generateCsvReport(List<Transaction> transactions, String filePath) {
+    public static void generateCsvReport(List<TransactionReportDto> transactions, String filePath) {
         try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
             writer.writeNext(new String[]{"ID", "Category", "Amount", "Date"});
-            for (Transaction transaction : transactions) {
+            for (TransactionReportDto transaction : transactions) {
                 writer.writeNext(new String[]{
                         String.valueOf(transaction.getId()),
-                        transaction.getCategory().getCategoryName(),
+                        transaction.getCategory(),
                         String.valueOf(transaction.getAmount()),
                         transaction.getDate().toString()
                 });
@@ -54,7 +52,7 @@ public class ReportGenerator {
     /**
      * Converts transactions to PDF and saves to a file.
      */
-    public static void generatePdfReport(List<Transaction> transactions, String filePath) {
+    public static void generatePdfReport(List<TransactionReportDto> transactions, String filePath) {
         try {
             PdfWriter writer = new PdfWriter(filePath);
             PdfDocument pdf = new PdfDocument(writer);
@@ -68,9 +66,9 @@ public class ReportGenerator {
             table.addCell("Amount");
             table.addCell("Date");
 
-            for (Transaction transaction : transactions) {
+            for (TransactionReportDto transaction : transactions) {
                 table.addCell(String.valueOf(transaction.getId()));
-                table.addCell(transaction.getCategory().getCategoryName());
+                table.addCell(transaction.getCategory());
                 table.addCell(String.valueOf(transaction.getAmount()));
                 table.addCell(transaction.getDate().toString());
             }

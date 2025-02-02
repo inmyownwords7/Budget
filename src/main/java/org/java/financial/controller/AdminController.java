@@ -3,8 +3,10 @@ package org.java.financial.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.java.financial.entity.Role;
 import org.java.financial.entity.UserEntity;
+import org.java.financial.exception.UserNotFoundException;
 import org.java.financial.repository.RoleRepository;
 import org.java.financial.repository.UserRepository;
+import org.java.financial.logging.GlobalLogger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -13,10 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
- * Controller for managing role promotions.
+ * Controller for managing user role changes.
  */
 @RestController
 @RequestMapping("/api/admin")
@@ -30,34 +31,72 @@ public class AdminController {
         this.roleRepository = roleRepository;
     }
 
-    @PostMapping(value = "/self-promote", produces = "application/json") // ✅ Ensure JSON response
+    /**
+     * ✅ Self-promote from USER to ADMIN
+     */
+    @PostMapping("/self-promote")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Map<String, String>> selfPromoteToAdmin(Authentication auth, HttpServletRequest request) {
         String username = ((UserDetails) auth.getPrincipal()).getUsername();
-        Optional<UserEntity> userOptional = userRepository.findByUsername(username);
+        return changeUserRole(username, "ROLE_ADMIN", request);
+    }
 
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(403).body(Map.of("error", "User not found."));
+    /**
+     * ✅ Promote any user to ADMIN (Admin-only action)
+     */
+    @PostMapping("/promote/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> promoteUserToAdmin(@PathVariable String username) {
+        return changeUserRole(username, "ROLE_ADMIN", null);
+    }
+
+    /**
+     * ✅ Demote ADMIN back to USER (Admin-only action)
+     */
+    @PostMapping("/demote/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> demoteAdminToUser(@PathVariable String username) {
+        return changeUserRole(username, "ROLE_USER", null);
+    }
+
+    /**
+     * ✅ Check a user's current role
+     */
+    @GetMapping("/role/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> getUserRole(@PathVariable String username) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        return ResponseEntity.ok(Map.of("username", username, "role", user.getRole().getRoleName()));
+    }
+
+    /**
+     * ✅ Generic method to change a user's role
+     */
+    private ResponseEntity<Map<String, String>> changeUserRole(String username, String newRole, HttpServletRequest request) {
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        if (user.getRole().getRoleName().equalsIgnoreCase(newRole)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "User is already " + newRole));
         }
 
-        UserEntity user = userOptional.get();
+        Role role = roleRepository.findByRoleName(newRole)
+                .orElseThrow(() -> new RuntimeException("Role " + newRole + " does not exist."));
 
-        if ("ROLE_ADMIN".equals(user.getRole().getRoleName())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "You are already an admin."));
-        }
-
-        Optional<Role> adminRole = roleRepository.findByRoleName("ROLE_ADMIN");
-
-        if (adminRole.isEmpty()) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "Admin role does not exist."));
-        }
-
-        user.setRole(adminRole.get());
+        user.setRole(role);
         userRepository.save(user);
 
-        request.getSession().invalidate();
-        SecurityContextHolder.clearContext();
+        GlobalLogger.LOGGER.info("User {} role changed to {}", username, newRole);
 
-        return ResponseEntity.ok(Map.of("message", "You have been promoted to ROLE_ADMIN. Please log in again."));
+        // If user is self-promoting, invalidate session & require re-login
+        if (request != null) {
+            request.getSession().invalidate();
+            SecurityContextHolder.clearContext();
+            return ResponseEntity.ok(Map.of("message", "Your role has been updated to " + newRole + ". Please log in again."));
+        }
+
+        return ResponseEntity.ok(Map.of("message", "User " + username + " has been updated to " + newRole));
     }
 }

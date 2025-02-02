@@ -2,7 +2,7 @@ package org.java.financial.controller;
 
 import org.java.financial.dto.TransactionRequest;
 import org.java.financial.entity.Transaction;
-import org.java.financial.entity.TransactionType;
+import org.java.financial.enums.TransactionType;
 import org.java.financial.repository.CategoryRepository;
 import org.java.financial.repository.TransactionRepository;
 import org.java.financial.repository.UserRepository;

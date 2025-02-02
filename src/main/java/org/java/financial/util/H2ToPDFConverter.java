@@ -1,8 +1,11 @@
 package org.java.financial.util;
 
-import com.itextpdf.kernel.pdf.*;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
+
+
 import java.sql.*;
 
 public class H2ToPDFConverter {

@@ -1,6 +1,7 @@
 package org.java.financial.entity;
 
 import jakarta.persistence.*;
+import org.java.financial.enums.CategoryType;
 
 @Entity
 @Table(name = "categories")
@@ -11,7 +12,7 @@ public class Category {
     private Long categoryId;
 
     @Column(nullable = false, unique = true)
-    private String categoryName; // ✅ This must match the repository method
+    private String categoryName;
 
     private String categoryDescription;
 
@@ -19,26 +20,12 @@ public class Category {
     @Column(nullable = false, length = 10)
     private CategoryType categoryType;
 
-    public Category() {
-    }
+    public Category() {}
 
     public Category(String categoryName, String categoryDescription, CategoryType categoryType) {
         this.categoryName = categoryName;
         this.categoryDescription = categoryDescription;
         this.categoryType = categoryType;
-    }
-
-    public Category(String categoryName, String categoryDescription, CategoryType categoryType, Long categoryId) {
-        this.categoryName = categoryName;
-        this.categoryDescription = categoryDescription;
-        this.categoryType = categoryType;
-        this.categoryId = categoryId;
-    }
-
-    public Category(Long categoryId, String categoryName, String categoryDescription) {
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
-        this.categoryDescription = categoryDescription;
     }
 
     public Long getCategoryId() {
@@ -67,15 +54,5 @@ public class Category {
 
     public void setCategoryType(CategoryType categoryType) {
         this.categoryType = categoryType;
-    }
-
-    @Override
-    public String toString() {
-        return "Category{" +
-                "categoryId=" + categoryId +
-                ", categoryName='" + categoryName + '\'' +
-                ", categoryDescription='" + categoryDescription + '\'' +
-                ", categoryType='" + categoryType + '\'' +
-                '}';
     }
 }

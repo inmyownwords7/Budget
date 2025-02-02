@@ -1,10 +1,11 @@
 package org.java.financial.entity;
 
 import jakarta.persistence.*;
+import org.java.financial.enums.TransactionType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 /**
  * Represents a financial transaction associated with a user.

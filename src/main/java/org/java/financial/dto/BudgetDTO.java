@@ -1,8 +1,7 @@
 package org.java.financial.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * DTO for Budget data transfer.
@@ -10,24 +9,19 @@ import java.math.BigDecimal;
 public class BudgetDTO {
 
     private Long budgetId;
-
-    @NotNull(message = "{error.budget.user.required}")
-    private Long userId;
-
-    @NotNull(message = "{error.budget.category.required}")
-    private Long categoryId;
-
-    @Min(value = 0, message = "{error.budget.amount.min}")
+    private String username;
+    private String categoryName;
     private BigDecimal amount;
+    private LocalDate startDate;
+    private LocalDate endDate;
 
-    // ✅ Constructors
-    public BudgetDTO() {}
-
-    public BudgetDTO(Long budgetId, Long userId, Long categoryId, BigDecimal amount) {
+    public BudgetDTO(Long budgetId, String username, String categoryName, BigDecimal amount, LocalDate startDate, LocalDate endDate) {
         this.budgetId = budgetId;
-        this.userId = userId;
-        this.categoryId = categoryId;
+        this.username = username;
+        this.categoryName = categoryName;
         this.amount = amount;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     // ✅ Getters and Setters
@@ -39,20 +33,20 @@ public class BudgetDTO {
         this.budgetId = budgetId;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public BigDecimal getAmount() {
@@ -61,5 +55,21 @@ public class BudgetDTO {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }

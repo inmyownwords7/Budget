@@ -1,7 +1,7 @@
 package org.java.financial.dto;
 
 import jakarta.validation.constraints.Null;
-import org.java.financial.entity.CategoryType;
+import org.java.financial.enums.CategoryType;
 
 import jakarta.validation.constraints.*;
 

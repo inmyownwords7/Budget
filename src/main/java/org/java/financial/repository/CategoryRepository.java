@@ -1,6 +1,7 @@
 package org.java.financial.repository;
 
 import org.java.financial.entity.Category;
+import org.java.financial.enums.CategoryType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -26,10 +27,20 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     /**
      * ✅ Retrieves all categories of a specific type (INCOME, EXPENSE, ASSET).
      */
-    List<Category> findByCategoryType(String categoryType);
+    List<Category> findByCategoryType(CategoryType categoryType);
 
     /**
      * ✅ Deletes a category by name.
      */
     void deleteByCategoryName(String categoryName);
+
+    /**
+     * ✅ Finds a category by ID.
+     */
+    Optional<Category> findById(Long categoryId);
+
+    /**
+     * ✅ Finds a category by name (case-insensitive).
+     */
+    Optional<Category> findByCategoryNameIgnoreCase(String categoryName);
 }

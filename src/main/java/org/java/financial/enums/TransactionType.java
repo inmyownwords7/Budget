@@ -1,4 +1,4 @@
-package org.java.financial.entity;
+package org.java.financial.enums;
 
 public enum TransactionType {
     INCOME,

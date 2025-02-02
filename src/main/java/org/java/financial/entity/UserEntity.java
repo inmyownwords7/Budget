@@ -1,161 +1,92 @@
 package org.java.financial.entity;
 
 import jakarta.persistence.*;
-import java.util.Objects;
 
-/**
- * Represents a user in the financial application.
- * <p>
- * This entity is mapped to the "users" table in the database and includes authentication details.
- * </p>
- */
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 public class UserEntity {
 
-    /**
-     * Unique identifier for the user.
-     * <p>
-     * This field is auto-generated using an identity strategy.
-     * </p>
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    /**
-     * The unique username of the user.
-     * <p>
-     * This field cannot be null and must be unique across all users.
-     * </p>
-     */
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    /**
-     * The securely hashed password of the user.
-     */
     @Column(nullable = false)
     private String password;
 
-    /**
-     * The role assigned to the user, defining their permissions.
-     */
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER) // ✅ FIX: Eager fetch roles
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    /**
-     * Default constructor required by JPA.
-     */
-    public UserEntity() {
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Budget> budgets;
 
-    /**
-     * Constructs a new UserEntity with the specified details.
-     *
-     * @param username The unique username.
-     * @param password The hashed password.
-     * @param role     The role assigned to the user.
-     */
+    // ✅ Constructors
+    public UserEntity() {}
+
     public UserEntity(String username, String password, Role role) {
         this.username = username;
         this.password = password;
         this.role = role;
+        // ✅ Automatically assign a default budget when the user is created
+        Budget defaultBudget = new Budget(this, null, new BigDecimal("100.00"), LocalDate.now(), LocalDate.now().plusMonths(1));
+        this.budgets.add(defaultBudget);
     }
 
-    /**
-     * Returns the user ID.
-     *
-     * @return The unique identifier of the user.
-     */
+    public UserEntity(Long userId, String username, String password, Role role) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
+    // ✅ Getters and Setters
     public Long getUserId() {
         return userId;
     }
 
-    /**
-     * Returns the username of the user.
-     *
-     * @return The username.
-     */
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Updates the username of the user.
-     *
-     * @param username The new username.
-     */
     public void setUsername(String username) {
         this.username = username;
     }
 
-    /**
-     * Returns the hashed password of the user.
-     *
-     * @return The hashed password.
-     */
     public String getPassword() {
         return password;
     }
 
-    /**
-     * Updates the user's password.
-     *
-     * @param password The new hashed password.
-     */
     public void setPassword(String password) {
         this.password = password;
     }
 
-    /**
-     * Returns the role assigned to the user.
-     *
-     * @return The role.
-     */
     public Role getRole() {
         return role;
     }
 
-    /**
-     * Updates the user's role.
-     *
-     * @param role The new role.
-     */
     public void setRole(Role role) {
         this.role = role;
     }
 
-    /**
-     * Determines equality between two UserEntity objects based on their username.
-     *
-     * @param o The object to compare.
-     * @return {@code true} if the usernames are equal, otherwise {@code false}.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserEntity that = (UserEntity) o;
-        return Objects.equals(username, that.username);
+    public Set<Budget> getBudgets() {
+        return budgets;
     }
 
-    /**
-     * Computes a hash code based on the username.
-     *
-     * @return The hash code.
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(username);
+    public void setBudgets(Set<Budget> budgets) {
+        this.budgets = budgets;
     }
 
-    /**
-     * Returns a string representation of the user.
-     *
-     * @return A formatted string containing user details.
-     */
     @Override
     public String toString() {
         return "UserEntity{" +

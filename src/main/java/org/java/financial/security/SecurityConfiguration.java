@@ -26,28 +26,22 @@ import java.util.List;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, PersistentTokenRepository tokenRepository) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/register", "/do-register", "/login", "/public/**").permitAll()
+                        .requestMatchers("/login", "/register", "/public/**").permitAll() // ✅ UI-based login
+                        .requestMatchers("/api/auth/**").permitAll() // ✅ API-based authentication
                         .requestMatchers("/dashboard", "/form", "/api/admin/self-promote").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/do-login")
-                        .defaultSuccessUrl("/dashboard", true)
+                        .loginPage("/login") // ✅ Redirects users to login page if not authenticated
+                        .loginProcessingUrl("/do-login") // ✅ Handles login submission
+                        .defaultSuccessUrl("/dashboard", true) // ✅ Redirects users after login
                         .permitAll()
-                )
-                .rememberMe(rememberMe -> rememberMe
-                        .key("uniqueAndSecretKey")
-                        .tokenRepository(tokenRepository)
-                        .tokenValiditySeconds(604800)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
