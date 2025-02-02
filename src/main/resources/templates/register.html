@@ -14,13 +14,30 @@
     <form th:action="@{/do-register}" th:object="${user}" method="post">
         <label>Username:</label>
         <input type="text" th:field="*{username}" required />
+        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="error"></div>
 
         <label>Password:</label>
         <input type="password" th:field="*{password}" required />
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></div>
 
-        <button type="submit">Register</button> <!-- ✅ Sends a POST request -->
+        <label>Role:</label>
+        <select th:field="*{role}">
+            <option value="ROLE_USER">User</option>
+            <option value="ROLE_ADMIN">Admin</option>
+        </select>
+        <div th:if="${#fields.hasErrors('role')}" th:errors="*{role}" class="error"></div>
+
+        <button type="submit">Register</button>
     </form>
 
+
+    <div th:if="${successMessage}" class="alert alert-success">
+        <span th:text="${successMessage}"></span>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <span th:text="${errorMessage}"></span>
+    </div>
 
     <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
 </div>

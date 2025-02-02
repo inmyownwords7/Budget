@@ -1,70 +1,72 @@
 package org.java.financial.controller;
 
-import org.java.financial.dto.UserResponseDTO;
-import org.java.financial.entity.AuthRequest;
-import org.java.financial.entity.AuthResponse;
-import org.java.financial.entity.UserEntity;
+import jakarta.validation.Valid;
+import org.java.financial.dto.UserRegistrationDTO;
+import org.java.financial.exception.UserAlreadyExistsException;
 import org.java.financial.security.AuthenticationService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-/**
- * **AuthController** handles authentication operations such as login and registration.
- * <p>
- * This controller is responsible for handling user authentication via API.
- * </p>
- */
-@RestController
-@RequestMapping("/auth")
+@Controller
 public class AuthController {
 
     private final AuthenticationService authenticationService;
 
-    /**
-     * Constructor for **AuthController**.
-     *
-     * @param authenticationService The authentication service used for handling login and registration.
-     */
     public AuthController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
-    /**
-     * Handles **user login** via API.
-     *
-     * @param request The authentication request containing username and password.
-     * @return A response containing the authenticated user's details or an error message.
-     */
-    @PostMapping("/do-login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        try {
-            AuthResponse response = authenticationService.authenticate(request);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    // ✅ Show login page
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login"; // Thymeleaf login.html
     }
 
-    /**
-     * Handles **user registration** via API.
-     *
-     * @param user The user details (username, password, role).
-     * @return A response containing the registered user's details or an error message.
-     */
+    @GetMapping("/register")
+    public String showRegistrationPage(Model model) {
+        model.addAttribute("user", new UserRegistrationDTO()); // ✅ Ensure 'user' exists in the model
+        return "register"; // Thymeleaf template
+    }
+
+
     @PostMapping("/do-register")
-    public ResponseEntity<?> register(@RequestBody UserEntity user) {
-        try {
-            UserEntity newUser = authenticationService.register(
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getRole().getRoleName()
-            );
-
-            return ResponseEntity.ok(new UserResponseDTO(newUser.getUsername(), newUser.getRole().getRoleName()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (javax.management.relation.RoleNotFoundException e) {
-            throw new RuntimeException(e);
+    public String registerUser(@Valid @ModelAttribute("user") UserRegistrationDTO userDTO,
+                               BindingResult result,
+                               RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            return "register"; // Stay on the registration page if validation fails
         }
+
+        try {
+            authenticationService.register(userDTO.getUsername(), userDTO.getPassword(), userDTO.getRole());
+            redirectAttributes.addFlashAttribute("successMessage", "✅ Registration successful! Please log in.");
+            return "redirect:/login"; // ✅ Redirect to login, not register
+        } catch (UserAlreadyExistsException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "⚠️ User already exists.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "❌ An error occurred.");
+        }
+        return "redirect:/register";
     }
+
+//    // ✅ Handle user login manually (optional, as Spring Security usually handles it)
+//    @PostMapping("/do-login")
+//    public String loginUser(@RequestParam String username,
+//                            @RequestParam String password,
+//                            RedirectAttributes redirectAttributes) {
+//        boolean isValid = authenticationService.validateUserCredentials(username, password);
+//
+//        if (isValid) {
+//            redirectAttributes.addFlashAttribute("successMessage", "Login successful!");
+//            return "redirect:/dashboard";
+//        } else {
+//            redirectAttributes.addFlashAttribute("errorMessage", "Invalid username or password.");
+//            return "redirect:/login?error=true";
+//        }
+//    }
 }

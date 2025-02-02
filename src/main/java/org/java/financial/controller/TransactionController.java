@@ -1,62 +1,41 @@
 package org.java.financial.controller;
 
+import org.java.financial.dto.TransactionRequest;
 import org.java.financial.entity.Transaction;
-import org.java.financial.service.TransactionService;
+import org.java.financial.entity.TransactionType;
+import org.java.financial.repository.CategoryRepository;
+import org.java.financial.repository.TransactionRepository;
+import org.java.financial.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
+import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api/transaction")
 public class TransactionController {
 
-    private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
-    public TransactionController(TransactionService transactionService) {
-        this.transactionService = transactionService;
+    public TransactionController(TransactionRepository transactionRepository,
+                                 UserRepository userRepository,
+                                 CategoryRepository categoryRepository) {
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
     }
 
-    @PostMapping
-    public ResponseEntity<Transaction> addTransaction(
-            @RequestParam Long userId,
-            @RequestParam Long categoryId,
-            @RequestParam BigDecimal amount,
-            @RequestParam String type,
-            @RequestParam(required = false) String description) {
-
-        Transaction transaction = transactionService.addTransaction(userId, categoryId, amount, type, description);
-        return ResponseEntity.ok(transaction);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Transaction>> getUserTransactions(@PathVariable Long userId) {
-        List<Transaction> transactions = transactionService.getUserTransactions(userId);
-        return ResponseEntity.ok(transactions);
-    }
-
-    @GetMapping("/{transactionId}")
-    public ResponseEntity<Transaction> getTransactionById(@PathVariable Long transactionId) {
-        Transaction transaction = transactionService.getTransactionById(transactionId);
-        return ResponseEntity.ok(transaction);
-    }
-
-    @PutMapping("/{transactionId}")
-    public ResponseEntity<Transaction> updateTransaction(
-            @PathVariable Long transactionId,
-            @RequestParam Long categoryId,
-            @RequestParam BigDecimal amount,
-            @RequestParam String type,
-            @RequestParam(required = false) String description) {
-
-        Transaction transaction = transactionService.updateTransaction(transactionId, categoryId, amount, type, description);
-        return ResponseEntity.ok(transaction);
-    }
-
-    @DeleteMapping("/{transactionId}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long transactionId) {
-        transactionService.deleteTransaction(transactionId);
-        return ResponseEntity.noContent().build();
+    @PostMapping("/do-create")
+    public ResponseEntity<?> createTransaction(@Valid @RequestBody TransactionRequest request) {
+        Transaction transaction = new Transaction(
+                userRepository.findById(request.getUserId()).orElseThrow(),
+                categoryRepository.findById(request.getCategoryId()).orElseThrow(),
+                request.getAmount(),
+                TransactionType.valueOf(request.getType()),
+                request.getDescription()
+        );
+        return ResponseEntity.ok(transactionRepository.save(transaction));
     }
 }

@@ -1,5 +1,6 @@
 package org.java.financial.security;
 
+import org.java.financial.entity.UserEntity;
 import org.java.financial.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,36 +22,32 @@ import org.springframework.security.web.authentication.rememberme.PersistentToke
 import javax.sql.DataSource;
 import java.util.List;
 
-/**
- * SecurityConfiguration class sets up authentication and authorization rules for the application.
- * It defines access control for different endpoints and configures authentication mechanisms.
- */
 @Configuration
 public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, PersistentTokenRepository tokenRepository) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for testing; enable later if needed
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/do-register", "/login", "/public/**").permitAll() // ✅ Allow registration/login
-                        .requestMatchers("/dashboard", "/form").hasAuthority("ROLE_USER")
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") // Admin protection
+                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/register", "/do-register", "/login", "/public/**").permitAll()
+                        .requestMatchers("/dashboard", "/form", "/api/admin/self-promote").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .formLogin(login -> login
-                        .loginPage("/login") // ✅ Ensure this page exists
+                        .loginPage("/login")
                         .loginProcessingUrl("/do-login")
                         .defaultSuccessUrl("/dashboard", true)
-                        .permitAll().successHandler((request, response, authentication) -> {
-                            request.getSession().setMaxInactiveInterval(3600); // 1-hour session timeout
-                            response.sendRedirect("/dashboard");
-                        })
+                        .permitAll()
                 )
                 .rememberMe(rememberMe -> rememberMe
-                        .key("uniqueAndSecretKey") // Change this key
-                        .tokenRepository(tokenRepository((DataSource) tokenRepository))
-                        .tokenValiditySeconds(604800) // 7 days
+                        .key("uniqueAndSecretKey")
+                        .tokenRepository(tokenRepository)
+                        .tokenValiditySeconds(604800)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -59,10 +58,18 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        return authenticationConfiguration.getAuthenticationManager();
-//    }
+    // ✅ Corrected: Provide UserDetailsService using UserRepository
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return username -> userRepository.findByUsername(username)
+                .map(user -> org.springframework.security.core.userdetails.User
+                        .withUsername(user.getUsername())
+                        .password(user.getPassword())
+                        .authorities(new SimpleGrantedAuthority(user.getRole().getRoleName()))
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+
 
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
@@ -72,15 +79,14 @@ public class SecurityConfiguration {
         return new ProviderManager(List.of(authProvider));
     }
 
-@Bean
-public PersistentTokenRepository tokenRepository(DataSource dataSource) {
-    JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
-    jdbcTokenRepository.setDataSource(dataSource);
+    @Bean
+    public PersistentTokenRepository tokenRepository(DataSource dataSource) {
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        jdbcTokenRepository.setCreateTableOnStartup(false);
+        return jdbcTokenRepository;
+    }
 
-    // ✅ This will create the `persistent_logins` table if it doesn't exist
-    jdbcTokenRepository.setCreateTableOnStartup(true);
-    return jdbcTokenRepository;
-}
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
