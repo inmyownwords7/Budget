@@ -1,15 +1,20 @@
 package org.java.financial.controller;
 
-import org.java.financial.dto.TransactionRequest;
+import jakarta.validation.Valid;
+import org.java.financial.dto.TransactionDTO;
 import org.java.financial.entity.Transaction;
+import org.java.financial.entity.UserEntity;
+import org.java.financial.entity.Category;
 import org.java.financial.enums.TransactionType;
-import org.java.financial.repository.CategoryRepository;
+import org.java.financial.exception.UserNotFoundException;
+import org.java.financial.exception.CategoryNotFoundException;
 import org.java.financial.repository.TransactionRepository;
 import org.java.financial.repository.UserRepository;
+import org.java.financial.repository.CategoryRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/transaction")
@@ -27,15 +32,24 @@ public class TransactionController {
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * ✅ Create a transaction using `TransactionDTO`.
+     */
     @PostMapping("/do-create")
-    public ResponseEntity<?> createTransaction(@Valid @RequestBody TransactionRequest request) {
-        Transaction transaction = new Transaction(
-                userRepository.findById(request.getUserId()).orElseThrow(),
-                categoryRepository.findById(request.getCategoryId()).orElseThrow(),
-                request.getAmount(),
-                TransactionType.valueOf(request.getType()),
-                request.getDescription()
-        );
-        return ResponseEntity.ok(transactionRepository.save(transaction));
+    public ResponseEntity<String> createTransaction(@Valid @RequestBody TransactionDTO transactionDTO) {
+        // ✅ Fetch UserEntity and Category before saving
+        UserEntity user = userRepository.findById(transactionDTO.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("❌ User not found with ID: " + transactionDTO.getUserId()));
+
+        Category category = categoryRepository.findById(transactionDTO.getCategoryId())
+                .orElseThrow(() -> new CategoryNotFoundException("❌ Category not found with ID: " + transactionDTO.getCategoryId()));
+
+        // ✅ Convert DTO to Entity
+        Transaction transaction = transactionDTO.toTransaction(user, category);
+
+        transactionRepository.save(transaction);
+
+        return ResponseEntity.ok("✅ Transaction successfully created!");
     }
+
 }

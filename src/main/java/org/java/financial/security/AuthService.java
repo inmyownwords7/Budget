@@ -2,44 +2,34 @@ package org.java.financial.security;
 
 import org.java.financial.entity.UserEntity;
 import org.java.financial.exception.UserNotFoundException;
-import org.java.financial.logging.GlobalLogger;
+import org.java.financial.exception.InvalidCredentialsException;
 import org.java.financial.repository.UserRepository;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-
-    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     /**
-     * ✅ Authenticates a user by checking credentials.
+     * ✅ Authenticate a user using `username` and `password` instead of `UserEntity`.
      */
-    public boolean authenticateUser(String username, String password) {
+    public boolean authenticate(String username, String password) {
+        // ✅ Fetch user from database
         UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+                .orElseThrow(() -> new UserNotFoundException("❌ User not found: " + username));
 
+        // ✅ Compare raw password with hashed password
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new InvalidCredentialsException("❌ Invalid password for user: " + username);
         }
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return true; // ✅ Authentication successful
     }
 }

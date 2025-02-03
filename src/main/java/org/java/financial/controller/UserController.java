@@ -2,13 +2,12 @@ package org.java.financial.controller;
 
 import org.java.financial.dto.UserRegistrationDTO;
 import org.java.financial.entity.UserEntity;
-import org.java.financial.exception.UserAlreadyExistsException;
+import org.java.financial.exception.*;
 import org.java.financial.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.RoleNotFoundException;
 import jakarta.validation.Valid;
 
 /**

@@ -3,6 +3,11 @@ package org.java.financial.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.java.financial.entity.Category;
+import org.java.financial.entity.Transaction;
+import org.java.financial.entity.UserEntity;
+import org.java.financial.enums.TransactionType;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -99,4 +104,14 @@ public class TransactionDTO {
     public void setTransactionDate(LocalDateTime transactionDate) {
         this.transactionDate = transactionDate;
     }
+    public Transaction toTransaction(UserEntity user, Category category) {
+        return new Transaction(
+                user,
+                category,
+                this.amount,
+                TransactionType.valueOf(this.transactionType.toUpperCase()), // Convert String to Enum
+                this.description
+        );
+    }
+
 }

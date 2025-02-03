@@ -1,83 +1,63 @@
 package org.java.financial.controller;
 
+import org.java.financial.dto.LoginDTO;
+import org.java.financial.dto.RegisterDTO;
 import org.java.financial.entity.UserEntity;
+import org.java.financial.exception.RoleNotFoundException;
 import org.java.financial.security.AuthService;
 import org.java.financial.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.RoleNotFoundException;
+import jakarta.validation.Valid;
 
 /**
  * **Auth Controller**
- * <p>
  * Handles user authentication (login) and registration.
- * </p>
  */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
-    private final UserService userService; // ✅ Added UserService
-
-
-    /**
-     * ✅ **GET Endpoint for Registration Page**
-     * Allows frontend to request the registration page.
-     */
-    @GetMapping("/register")
-    public String showRegisterPage() {
-        return "Please use POST /register with username, password, and role.";
-    }
+    private final UserService userService;
 
     /**
-     * ✅ **GET Endpoint for Login Page**
-     * Allows frontend to request the login page.
-     */
-    @GetMapping("/login")
-    public String showLoginPage() {
-        return "Please use POST /login with username and password.";
-    }
-
-    /**
-     * **Constructor for AuthController**
-     *
-     * @param authService Service for user authentication.
-     * @param userService Service for user registration & management.
+     * ✅ Constructor for AuthController.
      */
     public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
-        this.userService = userService; // ✅ Assign UserService
+        this.userService = userService;
     }
 
     /**
-     * **Registers a new user.**
-     *
-     * @param username The username for the new user.
-     * @param password The user's password.
-     * @param role The role assigned to the user (e.g., "ROLE_USER").
-     * @return The created {@link UserEntity}.
-     * @throws RoleNotFoundException If the role does not exist.
+     * ✅ Show registration instructions.
+     */
+    @GetMapping("/register")
+    public String showRegisterPage() {
+        return "Please use POST /do-register with JSON body {username, password, role}.";
+    }
+
+    /**
+     * ✅ Show login instructions.
+     */
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "Please use POST /do-login with JSON body {username, password}.";
+    }
+
+    /**
+     * ✅ Registers a new user securely.
      */
     @PostMapping("/do-register")
-    public UserEntity registerUser(
-            @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String role) throws RoleNotFoundException {
-        return userService.registerUser(username, password, role); // ✅ Fixed reference
+    public UserEntity registerUser(@Valid @RequestBody RegisterDTO registerDTO) throws RoleNotFoundException {
+        return userService.registerUser(registerDTO.getUsername(), registerDTO.getPassword(), registerDTO.getRole());
     }
 
     /**
-     * **Authenticates a user by checking credentials.**
-     *
-     * @param username The username.
-     * @param password The user's password.
-     * @return `true` if authentication succeeds, `false` otherwise.
+     * ✅ Authenticates a user using `LoginDTO` object.
      */
     @PostMapping("/do-login")
-    public boolean loginUser(
-            @RequestParam String username,
-            @RequestParam String password) {
-        return authService.authenticateUser(username, password); // ✅ Fixed reference
+    public boolean loginUser(@Valid @RequestBody LoginDTO loginDTO) {
+        return authService.authenticate(loginDTO.getUsername(), loginDTO.getPassword()); // ✅ Pass only needed fields
     }
 }

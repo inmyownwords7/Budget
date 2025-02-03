@@ -1044,3 +1044,21 @@ org.springframework.web.HttpRequestMethodNotSupportedException: Request method '
 2025-02-02 16:22:40 [main] DEBUG o.j.financial.FinancialApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
 2025-02-02 16:22:40 [main] INFO  o.j.financial.FinancialApplication - No active profile set, falling back to 1 default profile: "default"
 2025-02-02 16:22:45 [main] INFO  o.j.financial.FinancialApplication - Started FinancialApplication in 5.46 seconds (process running for 6.615)
+2025-02-02 17:20:31 [main] INFO  o.j.financial.FinancialApplication - Starting FinancialApplication using Java 23.0.1 with PID 22532 (G:\Github\financial\target\classes started by Inmyo in G:\Github\financial)
+2025-02-02 17:20:31 [main] DEBUG o.j.financial.FinancialApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-02-02 17:20:31 [main] INFO  o.j.financial.FinancialApplication - No active profile set, falling back to 1 default profile: "default"
+2025-02-02 17:20:39 [main] INFO  o.j.financial.FinancialApplication - Started FinancialApplication in 8.776 seconds (process running for 11.933)
+2025-02-02 19:12:20 [main] INFO  o.j.financial.FinancialApplication - Starting FinancialApplication using Java 23.0.1 with PID 28548 (G:\Github\financial\target\classes started by Inmyo in G:\Github\financial)
+2025-02-02 19:12:20 [main] DEBUG o.j.financial.FinancialApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-02-02 19:12:20 [main] INFO  o.j.financial.FinancialApplication - No active profile set, falling back to 1 default profile: "default"
+2025-02-02 19:12:26 [main] INFO  o.j.financial.FinancialApplication - Started FinancialApplication in 6.839 seconds (process running for 7.825)
+2025-02-02 19:18:21 [main] INFO  o.j.financial.FinancialApplication - Starting FinancialApplication using Java 23.0.1 with PID 26120 (G:\Github\financial\target\classes started by Inmyo in G:\Github\financial)
+2025-02-02 19:18:21 [main] DEBUG o.j.financial.FinancialApplication - Running with Spring Boot v3.4.2, Spring v6.2.2
+2025-02-02 19:18:21 [main] INFO  o.j.financial.FinancialApplication - No active profile set, falling back to 1 default profile: "default"
+2025-02-02 19:18:28 [main] INFO  o.j.financial.FinancialApplication - Started FinancialApplication in 7.209 seconds (process running for 8.273)
+2025-02-02 19:21:27 [http-nio-8080-exec-10] ERROR org.java.financial - 🔎 User not found: ❌ User not found: testuser
+2025-02-02 19:22:50 [http-nio-8080-exec-3] INFO  org.java.financial - ✅ New user 'testuser' registered successfully with role 'ROLE_USER'
+2025-02-02 19:22:50 [http-nio-8080-exec-3] INFO  org.java.financial - 📌 Category 'General Expenses' not found. Creating it.
+2025-02-02 19:22:50 [http-nio-8080-exec-3] ERROR org.java.financial - ❌ Unhandled exception: could not execute statement [NULL not allowed for column "CREATED_AT"; SQL statement:
+insert into budgets (amount,category_id,end_date,start_date,user_id,budget_id) values (?,?,?,?,?,default) [23502-232]] [insert into budgets (amount,category_id,end_date,start_date,user_id,budget_id) values (?,?,?,?,?,default)]; SQL [insert into budgets (amount,category_id,end_date,start_date,user_id,budget_id) values (?,?,?,?,?,default)]; constraint [null]
+2025-02-02 19:23:06 [http-nio-8080-exec-4] ERROR org.java.financial - ❌ Unhandled exception: Validation failed for argument [0] in public org.java.financial.entity.UserEntity org.java.financial.controller.AuthController.registerUser(org.java.financial.dto.RegisterDTO) throws org.java.financial.exception.RoleNotFoundException: [Field error in object 'registerDTO' on field 'role': rejected value [null]; codes [NotBlank.registerDTO.role,NotBlank.role,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerDTO.role,role]; arguments []; default message [role]]; default message [Role is required]] 

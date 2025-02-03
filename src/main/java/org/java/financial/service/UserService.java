@@ -1,20 +1,24 @@
 package org.java.financial.service;
 
 import org.java.financial.entity.UserEntity;
+import org.java.financial.exception.UserAlreadyExistsException;
+import org.java.financial.exception.UserNotFoundException;
+import org.java.financial.exception.RoleNotFoundException;
 
-import javax.management.relation.RoleNotFoundException;
-//UserService should handle user registration, role management, and fetching user data.
 public interface UserService {
 
     /**
-     * ✅ Register a new user.
+     * ✅ Registers a new user.
      */
-    UserEntity registerUser(String username, String password, String role) throws RoleNotFoundException;
+    UserEntity registerUser(String username, String password, String role) throws RoleNotFoundException, UserAlreadyExistsException;
 
     /**
-     * ✅ Check if user exists.
+     * ✅ Fetches an existing user by username.
+     */
+    UserEntity findUserByUsername(String username) throws UserNotFoundException;
+
+    /**
+     * ✅ Checks if a username already exists.
      */
     boolean userExists(String username);
-
-//    boolean validateUserCredentials(String username, String password);
 }

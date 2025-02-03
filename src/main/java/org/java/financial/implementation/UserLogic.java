@@ -2,14 +2,15 @@ package org.java.financial.implementation;
 
 import org.java.financial.entity.*;
 import org.java.financial.enums.CategoryType;
-import org.java.financial.exception.UserAlreadyExistsException;
+import org.java.financial.exception.*;
+import org.java.financial.exception.UserNotFoundException;
 import org.java.financial.logging.GlobalLogger;
 import org.java.financial.repository.*;
 import org.java.financial.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -102,6 +103,17 @@ public class UserLogic implements UserService {
         GlobalLogger.LOGGER.info("📊 Assigned default budget of $100.00 to user '{}'", user.getUsername());
 
         return user;
+    }
+
+    /**
+     * ✅ Fetch UserEntity by username.
+     *
+     * @param username
+     */
+    @Override
+    public UserEntity findUserByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
     }
 
     /**
